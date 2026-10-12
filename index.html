@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roles · Frinks Vision</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --orange:#ff4301; --ink:#0e0f0f; --muted:#6b7280; --gray300:#d1d5db; --gray400:#9ca3af;
+    --line:#e5e7eb; --drawer-line:#E3E5E5; --side:#1e1c1c;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+
+  /* ---------- Sidebar (expanded, 350px, #1e1c1c) ---------- */
+  .side{position:fixed;left:0;top:0;bottom:0;width:350px;background:var(--side);border-right:1px solid var(--gray300);
+    display:flex;flex-direction:column;padding:28px 0 20px 24px;color:#fff;z-index:5}
+  .brand{display:flex;align-items:center;gap:12px;font-size:26px;font-weight:600;letter-spacing:.02em;padding-left:4px}
+  .brand svg{width:40px;height:40px}
+  .menu{list-style:none;margin:32px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+  .mi{display:flex;align-items:center;border-radius:6px;padding:8px;margin-right:24px;font-size:18px;cursor:default}
+  .mi .ic{width:32px;display:flex;justify-content:center;flex:none}
+  .mi .t{margin-left:16px}
+  .mi:hover{background:rgba(255,255,255,.1)}
+  .sub{list-style:none;margin:8px 0 8px;padding:0;display:flex;flex-direction:column;gap:8px}
+  .sub li{margin-right:24px;padding:8px 8px 8px 56px;border-radius:6px;font-size:18px;color:#fff}
+  .sub li.active{background:rgba(255,255,255,.2)}
+  .side .user{margin-top:auto;display:flex;align-items:center;gap:12px;font-size:16px;padding:8px;margin-right:24px}
+  .side .user .av{width:34px;height:34px;border-radius:50%;background:var(--orange);display:grid;place-items:center;font-weight:600}
+
+  /* ---------- Roles page ---------- */
+  .main{margin-left:350px;min-height:100%;background:#fff}
+  .heading{display:flex;align-items:center;justify-content:space-between;height:60px;margin-top:4px;padding:16px 20px}
+  .heading h1{font-size:30px;font-weight:500;margin:0}
+  .btn{font-family:inherit;font-weight:600;font-size:14px;padding:8px 24px;border-radius:6px;cursor:pointer;border:1px solid transparent;line-height:20px}
+  .btn-primary{background:var(--orange);color:#fff}
+  .btn-primary:hover{background:rgba(255,67,1,.9)}
+  .btn-border{background:transparent;border-color:var(--orange);color:var(--orange)}
+  .btn-border:hover{opacity:.7}
+  .btn:disabled{background:#e5e7eb;color:#6b7280;border-color:transparent;cursor:not-allowed;opacity:1}
+  .wrapT{padding:16px}
+  table.rt{width:100%;border-collapse:collapse}
+  table.rt thead tr{background:var(--orange)}
+  table.rt th{color:#fff;font-weight:500;font-size:16px;padding:16px 8px;text-align:center;position:relative}
+  table.rt th:not(:last-child)::after{content:"";position:absolute;right:0;top:10px;bottom:10px;width:2px;border-radius:2px;background:#fff}
+  table.rt td{padding:12px 8px;text-align:center;border-bottom:1px solid var(--line);font-size:15px}
+  .dots{cursor:pointer;padding:4px 6px;border-radius:6px;position:relative;display:inline-block}
+  .dots:hover{background:#f3f4f6}
+  .ddm{position:absolute;right:28px;top:0;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 25px rgba(0,0,0,.12);
+    list-style:none;margin:0;padding:0;width:110px;text-align:left;z-index:4}
+  .ddm li{display:flex;align-items:center;gap:8px;padding:8px;font-size:12px;cursor:pointer}
+  .ddm li:hover{background:#f3f4f6}
+  .ddm li.del{color:#ef4444}
+  .lock{font-size:12px;color:var(--muted)}
+
+  /* ---------- Drawer (CreateRoleDrawer) ---------- */
+  .overlay{position:fixed;inset:0;background:#00000080;z-index:50;display:flex;justify-content:flex-end}
+  .drawer{height:100vh;width:min(1360px,calc(100vw - 80px));background:#fff;display:flex;flex-direction:column}
+  .d-head{height:5vh;min-height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:4px solid var(--drawer-line);padding:0 20px;font-size:18px;font-weight:600}
+  .d-head .x{cursor:pointer;padding:4px 8px}
+  .d-body{flex:1;display:flex;min-height:0}
+  .stepcol{width:260px;flex:none;border-right:2px solid var(--drawer-line);display:flex;align-items:center;justify-content:center}
+  .vs{display:flex;flex-direction:column;align-items:flex-start}
+  .vs .st{display:flex;align-items:flex-start}
+  .vs .col{display:flex;flex-direction:column;align-items:center}
+  .vs .dot{margin:10px 0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+  .vs .dot.cur,.vs .dot.done{background:var(--orange)}
+  .vs .dot.todo{border:2px solid var(--gray400)}
+  .vs .bar{height:100px;width:2px;background:var(--gray300)}
+  .vs .bar.done{background:var(--orange)}
+  .vs .lbl{margin:10px 0 0 16px;width:150px;font-size:18px;color:var(--muted);cursor:pointer}
+  .vs .lbl.cur{font-weight:700;color:#000}
+  .d-content{flex:1;overflow-y:auto;min-width:0}
+  .d-foot{height:6vh;min-height:58px;display:flex;justify-content:space-between;align-items:center;border-top:4px solid var(--drawer-line);padding:0 16px 0 260px}
+  .d-foot .l{display:flex;gap:16px;align-items:center;padding-left:16px}
+  .hint{font-size:13px;color:var(--muted)}
+
+  /* Basic info */
+  .basic{display:flex;flex-direction:column;gap:16px;padding:40px 80px 40px 40px}
+  .basic .h{font-size:30px;font-weight:700}
+  .basic .p{font-size:22px}
+  .fld{display:flex;flex-direction:column;padding:0 12px}
+  .fld .lb{font-size:18px;font-weight:500;margin-bottom:8px}
+  .fld .lb span{color:#ef4444}
+  .fld input,.fld textarea{font-family:inherit;font-size:16px;border:1px solid var(--gray300);border-radius:8px;padding:12px 14px;outline:none;resize:none}
+  .fld input:focus,.fld textarea:focus{border-color:var(--orange)}
+
+  /* Permissions */
+  .perm{margin:16px;background:#fff;border-radius:8px;box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1);padding:16px}
+  .perm h2{font-size:20px;font-weight:700;margin:0 0 16px}
+  .perm .desc{margin:0 0 24px;font-size:16px}
+  .ghead{position:sticky;top:0;z-index:2;display:flex;background:#fff;border-bottom:2px solid var(--line);padding:0 16px 4px;margin-left:8px;margin-bottom:8px}
+  .ghead .r{flex:1;font-size:18px;font-weight:700}
+  .ghead .c{min-width:120px;text-align:center;font-size:18px;font-weight:700}
+  .grp{margin-bottom:8px}
+  .row{display:flex;align-items:center;padding:10px;border-radius:8px}
+  .row:hover{background:#f3f4f6}
+  .row .r{flex:1;display:flex;align-items:center;min-width:0}
+  .row .r .chev{width:20px;color:var(--muted);margin-right:8px;cursor:pointer;transition:transform .15s}
+  .grp.closed .chev{transform:rotate(-90deg)}
+  .grp.closed .kids{display:none}
+  .row.top .r{font-weight:700}
+  .kids{padding-left:24px}
+  .kids .row .r{padding-left:32px}
+  .row .r small{display:block;color:var(--muted);font-size:13px;font-weight:400}
+  .row .c{min-width:120px;display:flex;justify-content:center}
+  .row .r .tipwrap{display:flex;flex-direction:column}
+  /* ThreeStateCheckbox: h-7 w-7 rounded-md border-2 gray-400; checked = f-primary */
+  .cb{width:28px;height:28px;border-radius:6px;border:2px solid var(--gray400);background:#fff;display:grid;place-items:center;cursor:pointer;transition:all .3s}
+  .cb svg{opacity:0;width:24px;height:24px;transition:opacity .3s}
+  .cb.on{background:var(--orange)}
+  .cb.on svg{opacity:1}
+  .cb.part{background:var(--gray300)}
+  .cbx{position:relative;display:flex;align-items:center}
+  .info{position:absolute;left:36px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--gray400);color:var(--muted);font-size:10px;font-weight:700;display:grid;place-items:center;cursor:help}
+  .info .tt{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);width:240px;background:#1e1c1c;color:#fff;font-size:12px;font-weight:400;line-height:1.45;padding:8px 10px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:9;text-align:left}
+  .info:hover .tt{opacity:1}
+  /* toggle switch for special actions and org on/off items */
+  .sw{width:40px;height:22px;border-radius:22px;background:var(--gray300);position:relative;cursor:pointer;flex:none;transition:background .2s}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .2s}
+  .sw.on{background:var(--orange)}
+  .sw.on::after{transform:translateX(18px)}
+  .sw.dis{opacity:.45;cursor:not-allowed}
+  .row.spec .r{color:#374151}
+  .row.spec .r .swlbl{display:flex;align-items:center;gap:12px}
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#fff;color:#111;box-shadow:0 6px 20px rgba(0,0,0,.15);
+    padding:10px 16px;border-radius:8px;font-size:14px;z-index:99;display:flex;gap:8px;align-items:center}
+  .toast i{width:18px;height:18px;border-radius:50%;background:#22c55e;display:grid;place-items:center;color:#fff;font-style:normal;font-size:11px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<aside class="side">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" fill="none"><path d="M6 16V9a3 3 0 0 1 3-3h7M42 16V9a3 3 0 0 0-3-3h-7M6 32v7a3 3 0 0 0 3 3h7M42 32v7a3 3 0 0 1-3 3h-7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M18 32V16l7 9 M25 25l6-9v16" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    frinks.ai
+  </div>
+  <ul class="menu">
+    <li class="mi"><span class="ic"><svg width="22" height="22" viewBox="0 0 20 16"><path fill="#f4f7f7" d="M1.5 3C1.5 2.17 2.17 1.5 3 1.5H7L8.5 3H17c.83 0 1.5.67 1.5 1.5V13c0 .83-.67 1.5-1.5 1.5H3c-.83 0-1.5-.67-1.5-1.5V3Z"/></svg></span><span class="t">Projects</span></li>
+    <li class="mi"><span class="ic"><svg width="24" height="24" viewBox="0 0 20 20"><path fill="#f4f7f7" d="M10 1.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17Zm0 4a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Zm0 11c-2.25 0-4.23-1.13-5.5-2.86.03-1.66 3-2.57 5.5-2.57s5.48.91 5.5 2.57C14.23 15.37 12.25 16.5 10 16.5Z"/></svg></span><span class="t">Teams &amp; Plants</span></li>
+    <li>
+      <div class="mi"><span class="ic"><svg width="20" height="16" viewBox="0 0 20 16"><path fill="#f4f7f7" d="M19 .5H1a.75.75 0 0 0-.75.75v13.5c0 .41.34.75.75.75h18c.41 0 .75-.34.75-.75V1.25A.75.75 0 0 0 19 .5ZM6.25 9.5v-3h7.5v3h-7.5Zm-4.5 0v-3h3v3h-3Zm13.5-3h3v3h-3v-3Zm3-1.5h-7.5V2h7.5v3Zm-9-3v3h-7.5V2h7.5Zm-7.5 9h7.5v3h-7.5v-3Zm9 3v-3h7.5v3h-7.5Z"/></svg></span><span class="t">Users &amp; Permissions</span></div>
+      <ul class="sub"><li>Users</li><li class="active">Roles</li></ul>
+    </li>
+    <li class="mi"><span class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f4f7f7" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span><span class="t">FrinksEdge Download</span></li>
+    <li class="mi"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke="#f4f7f7" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="t">Manual Assistant</span></li>
+  </ul>
+  <div class="user"><div class="av">A</div>Admin</div>
+</aside>
+
+<main class="main">
+  <div class="heading"><h1>Roles</h1><button class="btn btn-primary" id="addRole">Add Role</button></div>
+  <div class="wrapT">
+    <table class="rt">
+      <thead><tr><th>Role Name</th><th>Description</th><th>Users Assigned</th><th style="width:80px"></th></tr></thead>
+      <tbody id="roleRows"></tbody>
+    </table>
+  </div>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="drawer">
+    <div class="d-head"><div id="dTitle">Add New Role</div><div class="x" id="dClose">X</div></div>
+    <div class="d-body">
+      <div class="stepcol"><div class="vs" id="stepper"></div></div>
+      <div class="d-content" id="dContent"></div>
+    </div>
+    <div class="d-foot">
+      <div class="l" id="footL"></div>
+      <button class="btn btn-border" id="cancelBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden><i>✓</i><span id="toastMsg"></span></div>
+
+<script>
+const CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>';
+const COLS=['Create','View','Edit','Delete','Download'];
+
+const ORG_SWITCHES=[{id:'edge',name:'FrinksEdge Download'},{id:'manual',name:'Manual Assistant'},{id:'demo',name:'Download Demo License'}];
+const ORG_ROWS=[
+  {id:'plants',name:'Plants & Teams',cols:['Create','View','Edit','Delete']},
+  {id:'users',name:'Users',note:'Deactivate is part of Edit',cols:['Create','View','Edit']},
+];
+const PROJ_ROWS=[
+  {id:'details',name:'Project Details',note:'Name, classes',cols:['Create','View','Edit','Delete'],tip:{col:'Edit',text:'Creators can always edit and delete projects they created.'}},
+  {id:'recipe',name:'Recipe',note:'Variants, cameras, captures, modules',cols:['Create','View','Edit','Delete']},
+  {id:'datasets',name:'Datasets',cols:COLS},
+  {id:'annot',name:'Annotations',note:'Create = start annotating existing images',cols:COLS,special:[{id:'autoann',name:'Run auto-annotation'}]},
+  {id:'models',name:'AI Models',note:'Create = train · Edit = thresholds',cols:['Create','View','Edit','Delete']},
+  {id:'inst',name:'Instances',note:'Download = instance package',cols:COLS},
+];
+const ALL_ROWS=[...ORG_ROWS,...PROJ_ROWS];
+
+function blankConfig(){ // new role default: View on everything, nothing else
+  const c={};
+  ALL_ROWS.forEach(r=>{c[r.id]={};r.cols.forEach(k=>c[r.id][k]=k==='View')});
+  PROJ_ROWS.forEach(r=>(r.special||[]).forEach(s=>c[s.id]=false));
+  ORG_SWITCHES.forEach(s=>c[s.id]=false);
+  return c;
+}
+function withGrants(g){const c=blankConfig();for(const k in g){if(typeof g[k]==='object')Object.assign(c[k],g[k]);else c[k]=g[k];}return c;}
+
+const roles=[
+  {name:'Org Admin',description:'Super admin role for organization',count:2,locked:true},
+  {name:'Standard User',description:'Standard user for organization',count:6,locked:true,config:blankConfig()},
+  {name:'Quality Engineer',description:'Sets up recipes and datasets, reviews models',count:3,config:withGrants({
+    manual:true,
+    details:{Edit:true},recipe:{Create:true,Edit:true},datasets:{Create:true,Edit:true,Download:true},
+    annot:{Create:true,Edit:true},autoann:true,models:{Create:true,Edit:true},inst:{Download:true}})},
+  {name:'Annotator',description:'Labels images in shared projects',count:4,config:withGrants({annot:{Create:true,Edit:true}})},
+];
+
+let ui={open:false,mode:'add',idx:null,step:0,name:'',desc:'',cfg:null,base:null,menu:null,closed:{}};
+
+/* ---------- roles table ---------- */
+function renderTable(){
+  document.getElementById('roleRows').innerHTML=roles.map((r,i)=>`<tr>
+    <td>${r.name}</td><td>${r.description}</td><td>${r.count}</td>
+    <td>${r.locked?'':`<span class="dots" data-menu="${i}">⋮${ui.menu===i?`<ul class="ddm"><li data-edit="${i}">✎ Edit</li><li class="del">🗑 Delete</li></ul>`:''}</span>`}</td></tr>`).join('');
+}
+
+/* ---------- drawer ---------- */
+const snap=()=>JSON.stringify([ui.name.trim(),ui.desc.trim(),ui.cfg]);
+const dirty=()=>snap()!==ui.base;
+const basicOk=()=>ui.name.trim()&&ui.desc.trim()&&!roles.some((r,i)=>r.name.toLowerCase()===ui.name.trim().toLowerCase()&&i!==ui.idx);
+
+function openDrawer(mode,idx){
+  ui.open=true;ui.mode=mode;ui.idx=mode==='edit'?idx:null;ui.step=0;ui.menu=null;
+  if(mode==='edit'){const r=roles[idx];ui.name=r.name;ui.desc=r.description;ui.cfg=JSON.parse(JSON.stringify(r.config));}
+  else{ui.name='';ui.desc='';ui.cfg=blankConfig();}
+  ui.base=snap();
+  renderAll();
+}
+function closeDrawer(){ui.open=false;renderAll();}
+
+function renderStepper(){
+  const steps=['Basic Information','Permissions'];
+  document.getElementById('stepper').innerHTML=steps.map((t,i)=>{
+    const cls=i===ui.step?'cur':i<ui.step?'done':'todo';
+    const dot=`<div class="dot ${cls}">${cls==='done'?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>':''}</div>`;
+    return `<div class="st"><div class="col">${dot}${i<steps.length-1?`<div class="bar ${i<ui.step?'done':''}"></div>`:''}</div><div class="lbl ${i===ui.step?'cur':''}" data-step="${i}">${t}</div></div>`;
+  }).join('');
+}
+function cb(on,attrs){return `<span class="cb ${on?'on':''}" role="checkbox" tabindex="0" aria-checked="${on}" ${attrs}>${CHECK}</span>`;}
+function rowHtml(r){
+  const cells=COLS.map(c=>{
+    if(!r.cols.includes(c)) return `<div class="c"></div>`;
+    const box=cb(ui.cfg[r.id][c],`data-r="${r.id}" data-c="${c}"`);
+    if(r.tip&&r.tip.col===c) return `<div class="c"><span class="cbx">${box}<span class="info">i<span class="tt">${r.tip.text}</span></span></span></div>`;
+    return `<div class="c">${box}</div>`;
+  }).join('');
+  let h=`<div class="row"><div class="r"><div class="tipwrap">${r.name}${r.note?`<small>${r.note}</small>`:''}</div></div>${cells}</div>`;
+  (r.special||[]).forEach(s=>{
+    const dis=!ui.cfg[r.id].View;
+    h+=`<div class="row spec"><div class="r"><span class="swlbl"><span class="sw ${ui.cfg[s.id]?'on':''} ${dis?'dis':''}" role="switch" tabindex="0" aria-checked="${ui.cfg[s.id]}" data-s="${s.id}" data-p="${r.id}"></span>${s.name}</span></div>${COLS.map(()=>'<div class="c"></div>').join('')}</div>`;
+  });
+  return h;
+}
+function topState(rows,c){
+  const vals=rows.filter(r=>r.cols.includes(c)).map(r=>ui.cfg[r.id][c]);
+  if(!vals.length) return null;
+  return vals.every(Boolean)?'on':vals.some(Boolean)?'part':'';
+}
+function group(key,title,rows,extra=''){
+  const tops=COLS.map(c=>{const s=topState(rows,c);return `<div class="c">${s===null?'':`<span class="cb ${s}" role="checkbox" tabindex="0" data-g="${key}" data-c="${c}">${s==='part'?'<svg viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" style="opacity:1"><path d="M19 12H5"/></svg>':CHECK}</span>`}</div>`}).join('');
+  return `<div class="grp ${ui.closed[key]?'closed':''}"><div class="row top"><div class="r"><svg class="chev" data-tog="${key}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>${title}</div>${tops}</div><div class="kids">${extra}${rows.map(rowHtml).join('')}</div></div>`;
+}
+function renderContent(){
+  const el=document.getElementById('dContent');
+  if(ui.step===0){
+    const dup=ui.name.trim()&&roles.some((r,i)=>r.name.toLowerCase()===ui.name.trim().toLowerCase()&&i!==ui.idx);
+    el.innerHTML=`<div class="basic"><div class="h">Basic Information</div><div class="p">Provide a name for the role and a short description for it.</div>
+      <div class="fld"><div class="lb">Role Name<span>*</span></div><input id="fName" placeholder="Enter role name" value="${ui.name.replace(/"/g,'&quot;')}">${dup?'<div style="color:#ef4444;font-size:14px;margin-top:4px">A role named '+ui.name.trim()+' already exists.</div>':''}</div>
+      <div class="fld"><div class="lb">Role Description<span>*</span></div><textarea id="fDesc" rows="3" placeholder="Enter role description">${ui.desc}</textarea></div></div>`;
+    return;
+  }
+  const sw=ORG_SWITCHES.map(s=>`<div class="row spec"><div class="r"><span class="swlbl"><span class="sw ${ui.cfg[s.id]?'on':''}" role="switch" tabindex="0" aria-checked="${ui.cfg[s.id]}" data-t="${s.id}"></span>${s.name}</span></div>${COLS.map(()=>'<div class="c"></div>').join('')}</div>`).join('');
+  el.innerHTML=`<div class="perm"><h2>Permissions</h2><p class="desc">Set the permissions for this role by choosing from the options below</p>
+    <div class="ghead"><div class="r">Resource</div>${COLS.map(c=>`<div class="c">${c}</div>`).join('')}</div>
+    ${group('org','Organization',ORG_ROWS,sw)}
+    ${group('proj','Projects <span style="font-weight:400;color:#6b7280;font-size:14px;margin-left:10px">applies to every project this person can see</span>',PROJ_ROWS)}
+  </div>`;
+}
+function renderFoot(){
+  const L=document.getElementById('footL');
+  const saveDis=!dirty()||!basicOk();
+  if(ui.step===0){
+    L.innerHTML=`<button class="btn btn-primary" id="nextBtn" ${basicOk()?'':'disabled'}>Next</button>${ui.mode==='edit'?`<button class="btn btn-primary" id="saveBtn" ${saveDis?'disabled':''}>Save</button>`:''}`;
+  } else {
+    L.innerHTML=`<button class="btn btn-border" id="backBtn">Back</button><button class="btn btn-primary" id="saveBtn" ${saveDis?'disabled':''}>Save</button><span class="hint">${dirty()?'Unsaved changes':'No changes yet'}</span>`;
+  }
+}
+function renderAll(){
+  renderTable();
+  const ov=document.getElementById('overlay');
+  ov.hidden=!ui.open;
+  if(!ui.open) return;
+  document.getElementById('dTitle').textContent=ui.mode==='add'?'Add New Role':'Edit Role';
+  renderStepper();renderContent();renderFoot();
+}
+
+/* ---------- interactions ---------- */
+function setCell(id,c,v){
+  const row=ALL_ROWS.find(r=>r.id===id);
+  if(c==='View'&&!v){row.cols.forEach(k=>ui.cfg[id][k]=false);(row.special||[]).forEach(s=>ui.cfg[s.id]=false);}
+  else{ui.cfg[id][c]=v;if(v)ui.cfg[id].View=true;}
+}
+function toast(m){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=m;t.hidden=false;setTimeout(()=>t.hidden=true,2000);}
+function act(t){
+  if(t.dataset.menu!==undefined&&!t.closest('.ddm')){ui.menu=ui.menu===+t.dataset.menu?null:+t.dataset.menu;renderTable();return;}
+  if(t.dataset.edit!==undefined){openDrawer('edit',+t.dataset.edit);return;}
+  if(t.dataset.step!==undefined){if(+t.dataset.step===1&&!basicOk())return;ui.step=+t.dataset.step;renderAll();return;}
+  if(t.dataset.tog){ui.closed[t.dataset.tog]=!ui.closed[t.dataset.tog];renderContent();return;}
+  if(t.dataset.r){setCell(t.dataset.r,t.dataset.c,!ui.cfg[t.dataset.r][t.dataset.c]);}
+  else if(t.dataset.g){const rows=t.dataset.g==='org'?ORG_ROWS:PROJ_ROWS,c=t.dataset.c,v=topState(rows,c)!=='on';rows.filter(r=>r.cols.includes(c)).forEach(r=>setCell(r.id,c,v));}
+  else if(t.dataset.s){if(t.classList.contains('dis'))return;ui.cfg[t.dataset.s]=!ui.cfg[t.dataset.s];}
+  else if(t.dataset.t){ui.cfg[t.dataset.t]=!ui.cfg[t.dataset.t];}
+  else return;
+  renderContent();renderFoot();
+}
+document.addEventListener('click',e=>{
+  const id=e.target.id;
+  if(id==='addRole') return openDrawer('add');
+  if(id==='dClose'||id==='cancelBtn'||id==='overlay') return closeDrawer();
+  if(id==='nextBtn'){ui.step=1;return renderAll();}
+  if(id==='backBtn'){ui.step=0;return renderAll();}
+  if(id==='saveBtn'){
+    const rec={name:ui.name.trim(),description:ui.desc.trim(),config:ui.cfg};
+    if(ui.mode==='edit')Object.assign(roles[ui.idx],rec);else roles.push({...rec,count:0});
+    toast(ui.mode==='edit'?'Role saved':'Role created');closeDrawer();return;
+  }
+  const t=e.target.closest('[data-menu],[data-edit],[data-step],[data-tog],[data-r],[data-g],[data-s],[data-t]');
+  if(t) act(t); else if(ui.menu!==null){ui.menu=null;renderTable();}
+});
+document.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){const t=e.target.closest('[data-r],[data-g],[data-s],[data-t]');if(t){e.preventDefault();act(t);}}});
+document.addEventListener('input',e=>{
+  if(e.target.id==='fName'){ui.name=e.target.value.trimStart();}
+  else if(e.target.id==='fDesc'){ui.desc=e.target.value.trimStart();}
+  else return;
+  renderFoot();
+  const dupEl=document.getElementById('fName');
+  // re-render only the duplicate message without losing focus
+  const fld=dupEl.parentElement, old=fld.querySelector('div[style]');
+  const dup=ui.name.trim()&&roles.some((r,i)=>r.name.toLowerCase()===ui.name.trim().toLowerCase()&&i!==ui.idx);
+  if(old)old.remove();
+  if(dup){const d=document.createElement('div');d.style.cssText='color:#ef4444;font-size:14px;margin-top:4px';d.textContent='A role named '+ui.name.trim()+' already exists.';fld.appendChild(d);}
+});
+renderAll();
+</script>
+</body>
+</html>
